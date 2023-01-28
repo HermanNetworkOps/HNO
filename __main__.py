@@ -1,7 +1,7 @@
 import pulumi
 import pulumi_aws as aws
 from pulumi_aws import ec2
-subnets = 0
+subnets = 3
 # Create an AWS resource 
 vpc = ec2.Vpc("vpc", cidr_block="10.0.0.0/16")
 priv_subnets = []
