@@ -31,11 +31,6 @@ route_table = aws.ec2.RouteTable(
 		}
 	]
 )
-rt_assoc = aws.ec2.RouteTableAssociation(
-	"HNO-rta-public",
-	route_table_id= "HNO-route-table-public",
-	subnet_id = [subnet.id for subnet in pub_subnets] # do an operation on subnet, then the for loop for subnet in subnets
-)
 
 ngw = aws.ec2.NatGateway
 "HNO-ngw"
@@ -51,6 +46,16 @@ route_table = aws.ec2.RouteTable(
 		}
 	]
 )
+for index in range(len(pub_subnets)):
+	route_table_association = aws.ec2.RouteTableAssociation
+	subnet_id = pub_subnets[index]
+	route_table_id = igw.id
+
+for index in range(len(priv_subnets)):
+	route_table_association = aws.ec2.RouteTableAssociation
+	subnet_id = priv_subnets[index]
+	route_table_id = ngw.id
+
 
 
 sg = aws.ec2.SecurityGroup(
