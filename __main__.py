@@ -31,11 +31,15 @@ route_table = aws.ec2.RouteTable(
 		}
 	]
 )
+aws_eip = ec2.Eip("eip1",
+vpc=True,
+)
 
-ngw = aws.ec2.NatGateway
-"HNO-ngw"
-vpc_id = vpc.id
-
+ngw = ec2.NatGateway(
+"HNO-ngw",
+subnet_id = priv_subnet,
+allocation_id=aws_eip
+)
 route_table = aws.ec2.RouteTable(
 	"HNO-route-table-private",
 	vpc_id=vpc.id,
@@ -46,16 +50,20 @@ route_table = aws.ec2.RouteTable(
 		}
 	]
 )
-for index in range(len(pub_subnets)):
-	route_table_association = aws.ec2.RouteTableAssociation
-	subnet_id = pub_subnets[index]
-	route_table_id = igw.id
-
-for index in range(len(priv_subnets)):
-	route_table_association = aws.ec2.RouteTableAssociation
-	subnet_id = priv_subnets[index]
-	route_table_id = ngw.id
-
+#for index in range(len(pub_subnets)):
+#	route_table_association = ec2.RouteTableAssociation(
+#	resource_name = "public-rta",
+#	subnet_id = pub_subnet.id,
+#	gateway_id = igw.id,
+#	route_table_id="HNO-route-table-public",
+#	)
+#for index in range(len(priv_subnets)):
+#	route_table_association = ec2.RouteTableAssociation(
+#	resource_name="priv_rta",
+#	subnet_id = priv_subnet.id,
+#	gateway_id=ngw.id,
+#	route_table_id="HNO-route-table-private",
+#	)
 
 
 sg = aws.ec2.SecurityGroup(
@@ -87,7 +95,7 @@ ec2_instance = aws.ec2.Instance(
 	vpc_security_group_ids=[sg.id],
 	ami = ami.id,
 	user_data=user_data,
-      subnet_id=pub_subnets.id,
+      subnet_id=pub_subnet.id,
       associate_public_ip_address=True,
 )
 
