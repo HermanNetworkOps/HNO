@@ -50,13 +50,16 @@ route_table = aws.ec2.RouteTable(
 		}
 	]
 )
-#for index in range(len(pub_subnets)):
-#	route_table_association = ec2.RouteTableAssociation(
-#	resource_name = "public-rta",
-#	subnet_id = pub_subnet.id,
-#	gateway_id = igw.id,
-#	route_table_id="HNO-route-table-public",
-#	)
+pub_rtas = []
+
+for pub_subnet in pub_subnets:
+	pub_rta = ec2.RouteTableAssociation(f"rta-{pub_subnet}-pub",
+	pub_rtas.append(pub_rta),
+	resource_name = "public-rta",
+	subnet_id = pub_subnet.id,
+	gateway_id = igw.id,
+	route_table_id="HNO-route-table-public",
+	)
 #for index in range(len(priv_subnets)):
 #	route_table_association = ec2.RouteTableAssociation(
 #	resource_name="priv_rta",
