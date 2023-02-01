@@ -52,22 +52,20 @@ route_table = aws.ec2.RouteTable(
 )
 pub_rtas = []
 
-for pub_subnet in pub_subnets:
-	pub_rta = ec2.RouteTableAssociation(f"rta-{pub_subnet}-pub",
-	pub_rtas.append(pub_rta),
-	resource_name = "public-rta",
-	subnet_id = pub_subnet.id,
+for pub_rta in range(0, subnets):
+    ec2.RouteTableAssociation(
+	resource_name=f"pub_rta{pub_rta}",
 	gateway_id = igw.id,
-	route_table_id="HNO-route-table-public",
+	route_table_id= "HNO-route-table-public",
 	)
-#for index in range(len(priv_subnets)):
-#	route_table_association = ec2.RouteTableAssociation(
-#	resource_name="priv_rta",
-#	subnet_id = priv_subnet.id,
-#	gateway_id=ngw.id,
-#	route_table_id="HNO-route-table-private",
-#	)
+priv_rtas = []
 
+for priv_rta in range(0, subnets):
+	ec2.RouteTableAssociation(
+		resource_name=f"priv_rta{priv_rta}",
+		gateway_id= ngw.id,
+		route_table_id= "HNO-route-table-private",
+	)
 
 sg = aws.ec2.SecurityGroup(
 	"HNO-http-sg",
@@ -98,7 +96,7 @@ ec2_instance = aws.ec2.Instance(
 	vpc_security_group_ids=[sg.id],
 	ami = ami.id,
 	user_data=user_data,
-      subnet_id=pub_subnet.id,
+      subnet_id=pub_subnet,
       associate_public_ip_address=True,
 )
 
