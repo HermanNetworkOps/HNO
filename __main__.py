@@ -21,12 +21,12 @@ igw = aws.ec2.InternetGateway(
 	"HNO-igw",
 	vpc_id =vpc.id
 )
-route_table = aws.ec2.RouteTable(
-	"HNO-route-table-public",
+route_table_public = aws.ec2.RouteTable(
+	"HNORTPub",
 	vpc_id=vpc.id,
 	routes=[
 		{
-			"cidr_block": "0.0.0.0/0",
+			"cidr_block": "10.0.0.0/8",
 			"gateway_id": igw.id
 		}
 	]
@@ -41,11 +41,11 @@ subnet_id = priv_subnet,
 allocation_id=aws_eip
 )
 route_table = aws.ec2.RouteTable(
-	"HNO-route-table-private",
+	"HNO-RTpr",
 	vpc_id=vpc.id,
 	routes=[
 		{
-			"cidr_block": "0.0.0.0/0",
+			"cidr_block": "10.0.0.0/16", 
 			"gateway_id": ngw.id
 		}
 	]
@@ -56,16 +56,16 @@ for pub_rta in range(0, subnets):
     ec2.RouteTableAssociation(
 	resource_name=f"pub_rta{pub_rta}",
 	gateway_id = igw.id,
-	route_table_id= "HNO-route-table-public",
+	route_table_id= route_table_public.id,
 	)
-priv_rtas = []
+#priv_rtas = []
 
-for priv_rta in range(0, subnets):
-	ec2.RouteTableAssociation(
-		resource_name=f"priv_rta{priv_rta}",
-		gateway_id= ngw.id,
-		route_table_id= "HNO-route-table-private",
-	)
+#for priv_rta in range(0, subnets):
+#	ec2.RouteTableAssociation(
+#		resource_name=f"priv_rta{priv_rta}",
+#		gateway_id= ngw.id,
+#		route_table_id= "HNO-RTPr",
+#	)
 
 sg = aws.ec2.SecurityGroup(
 	"HNO-http-sg",
