@@ -26,7 +26,7 @@ route_table_public = aws.ec2.RouteTable(
 	vpc_id=vpc.id,
 	routes=[
 		{
-			"cidr_block": "10.0.0.0/8",
+			"cidr_block": "0.0.0.0/0",
 			"gateway_id": igw.id
 		}
 	]
@@ -40,33 +40,33 @@ ngw = ec2.NatGateway(
 subnet_id = priv_subnet,
 allocation_id=aws_eip
 )
-route_table = aws.ec2.RouteTable(
+route_table_private = aws.ec2.RouteTable(
 	"HNO-RTpr",
 	vpc_id=vpc.id,
 	routes=[
 		{
-			"cidr_block": "10.0.0.0/16", 
+			"cidr_block": "0.0.0.0/0", 
 			"gateway_id": ngw.id
 		}
 	]
 )
 pub_rtas = []
 
-for pub_rta in range(0, subnets):
-    ec2.RouteTableAssociation(
-	resource_name=f"pub_rta{pub_rta}",
-	gateway_id = igw.id,
-	route_table_id= route_table_public.id,
+for index, subnet in enumerate(pub_subnets):
+    rta = ec2.RouteTableAssociation(f"pub_rta{index}",
+        subnet_id = subnet.id,
+        route_table_id = route_table_public.id
 	)
-#priv_rtas = []
+    pub_rtas.append(rta)
 
-#for priv_rta in range(0, subnets):
-#	ec2.RouteTableAssociation(
-#		resource_name=f"priv_rta{priv_rta}",
-#		gateway_id= ngw.id,
-#		route_table_id= "HNO-RTPr",
-#	)
+priv_rtas = []
 
+for index, subnet in enumerate(priv_subnets):
+    rta = ec2.RouteTableAssociation(f"priv_rta{index}",
+        subnet_id = subnet.id,
+        route_table_id = route_table_private.id
+	)
+    pub_rtas.append(rta)
 sg = aws.ec2.SecurityGroup(
 	"HNO-http-sg",
 	description="Allow http traffic to ec2 instance",
