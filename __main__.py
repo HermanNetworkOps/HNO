@@ -102,7 +102,3 @@ ec2_instance = aws.ec2.Instance(
 
 # Export the name of the bucket
 pulumi.export ("ec2-public-ip", ec2_instance.public_ip)
-
-
-
-
