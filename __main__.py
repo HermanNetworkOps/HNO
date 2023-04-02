@@ -2,7 +2,7 @@ import pulumi
 import pulumi_aws as aws
 from pulumi_aws import ec2
 subnets = 3
-# Create an AWS resource 
+# Create a VPC
 vpc = ec2.Vpc("vpc", cidr_block="10.0.0.0/16")
 priv_subnets = []
 pub_subnets = []
@@ -100,5 +100,16 @@ ec2_instance = aws.ec2.Instance(
       associate_public_ip_address=True,
 )
 
+
 # Export the name of the bucket
 pulumi.export ("ec2-public-ip", ec2_instance.public_ip)
+
+# create an ECS cluster
+my_HNO_cluster = aws.ecs.Cluster("my_HNO_cluster")
+my_HNO_cluster = my_HNO_cluster.arn
+network_configuration = aws.ecs.ServiceNetworkConfigurationArgs(
+		subnets= priv_subnets + pub_subnets,
+		security_groups = [sg.id],
+),
+desired_count = 1
+
